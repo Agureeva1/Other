@@ -2,9 +2,12 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static String[] products = { "Хлеб", "Пачка гречки", "Упаковка яиц", "Мороженка" };
-    public static int[] prices = { 50, 135, 65, 53 };
+    public static String[] products = {"Хлеб", "Пачка гречки", "Упаковка яиц", "Мороженка"};
+    public static int[] prices = {50, 135, 65, 53};
     public static int MIN_COST_FOR_BONUS = 1000;
+
+    // В стоимости этих товаров каждые три товара должны стоить как два:
+    public static String[] productsOnSale = {"Хлеб", "Мороженка"};
 
     public static void main(String[] args) {
         System.out.println("Добро пожаловать в магазин!");
@@ -38,12 +41,37 @@ public class Main {
         for (int i = 0; i < products.length; i++) {
             sum += prices[i] * counts[i];
         }
+        int cost = 0;
         boolean doBonus = sum >= MIN_COST_FOR_BONUS;
         for (int i = 0; i < products.length; i++) {
             if (counts[i] != 0) {
-                System.out.println("\t" + products[i] + " " + (doBonus ? counts[i] + 1 : counts[i]) + " шт. за " + (prices[i] * counts[i]) + " руб.");
+                boolean isOnSale = false;
+                for (String saleProduct : productsOnSale) {
+                    if (products[i].equals(saleProduct)) {
+                        if (counts[i] >= 3) {
+                            isOnSale = true;
+                        }
+                    }
+                }
+                if (doBonus && isOnSale) {
+                    System.out.println("акция");
+                    System.out.println("\t" + products[i] + " " + (counts[i] + 1) + " шт. за " + (prices[i] * (counts[i] / 3 * 2 + counts[i] % 3)) + " руб. (распродажа!)");
+                    cost += prices[i] * (counts[i] / 3 * 2 + counts[i] % 3);
+                } else if (doBonus && !isOnSale) {
+                    System.out.println("\t" + products[i] + " " + (counts[i] + 1) + " шт. за " + (prices[i] * counts[i]) + " руб.");
+                    cost += prices[i] * counts[i];
+                } else if (!doBonus && isOnSale) {
+                    System.out.println("\t" + products[i] + " " + counts[i] + " шт. за " + (prices[i] * (counts[i] / 3 * 2 + counts[i] % 3)) + " руб. (распродажа!)");
+                    cost += prices[i] * (counts[i] / 3 * 2 + counts[i] % 3);
+                } else {
+                    System.out.println("\t" + products[i] + " " + counts[i] + " шт. за " + (prices[i] * counts[i]) + " руб.");
+                    cost += prices[i] * counts[i];
+                }
+
             }
+
         }
-        System.out.println("Итого: " + sum + " руб.");
+        System.out.println("Итого: " + cost + " руб.");
     }
+
 }
